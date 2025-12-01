@@ -5,7 +5,8 @@ import * as wasm from "wasm-game-of-life";
 
 const w = 10;
 const h = 10;
-let u = wasm.Universe.new(w, h);
+// let u = wasm.Universe.new(w, h);
+let u = wasm.Universe.rand(w, h);
 let pre = document.getElementById("text-canvas");
 
 // since the tutorial's 
@@ -33,7 +34,7 @@ function render()
         }
         pre.textContent += "\n";
     }
-    
+
     u.tick();
 
     setTimeout(() => requestAnimationFrame(render), 500);

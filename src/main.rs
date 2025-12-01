@@ -8,4 +8,9 @@ fn main() {
         universe.tick();
     }
     println!("{}", universe);
+
+
+    let rand_universe: Universe = Universe::rand(10, 10);
+    println!("{}", rand_universe);
+
 }

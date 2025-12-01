@@ -4,6 +4,8 @@ use std::fmt::{Display, Formatter};
 
 use wasm_bindgen::prelude::*;
 
+use js_sys::Math;
+
 #[wasm_bindgen]
 extern "C" {
     fn alert(s: &str);
@@ -50,6 +52,29 @@ impl Universe {
             }
         }
         return count;
+    }
+}
+
+#[cfg(feature = "binary")]
+impl Universe{
+    
+    
+    pub fn rand(width: u32, height: u32) -> Self {
+        use rand::prelude::*;
+        // let mut cells = vec![Cell::Dead; (width * height) as usize];
+        
+        let cells = (0..width*height).map(|index|  {
+            match rand::random::<bool>() {
+                true => Cell::Alive,
+                false => Cell::Dead
+            }
+        }).collect();
+        
+        Self {
+            width: width,
+            height: height,
+            cells: cells,
+        }
     }
 }
 
@@ -109,6 +134,27 @@ impl Universe {
 
     pub fn cells(&self) -> *const Cell{
         self.cells.as_ptr()
+    }
+    
+    pub fn rand(width: u32, height: u32) -> Self {
+        
+        // let mut cells = vec![Cell::Dead; (width * height) as usize];
+        
+        let cells = (0..width*height).map(|index|  {
+            if Math::random() < 0.5 {
+                Cell::Alive
+            }
+            else {
+                Cell::Dead
+
+            }
+        }).collect();
+        
+        Self {
+            width: width,
+            height: height,
+            cells: cells,
+        }
     }
 }
 
