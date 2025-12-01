@@ -106,6 +106,10 @@ impl Universe {
     pub fn render(&self) -> String {
         self.to_string()
     }
+
+    pub fn cells(&self) -> *const Cell{
+        self.cells.as_ptr()
+    }
 }
 
 impl Display for Universe {
@@ -126,4 +130,10 @@ impl Display for Universe {
 
         Ok(())
     }
+}
+
+#[wasm_bindgen]
+pub fn wasm_memory() -> JsValue
+{
+    wasm_bindgen::memory()
 }
