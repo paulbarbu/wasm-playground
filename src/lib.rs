@@ -90,7 +90,7 @@ impl Universe {
     }
 
     pub fn new(width: u32, height: u32) -> Self{
-        // set the middle cell to 1
+        // create a line
         let mut cells   = vec![Cell::Dead; (width*height) as usize];
         let i = (((width * height) / 2) + width/2) as usize;
         cells[i-1] = Cell::Alive;
@@ -107,10 +107,11 @@ impl Display for Universe {
                 let i = self.get_index(row, col);
 
                 let cell = self.cells[i];
-                match cell {
-                    Cell::Alive => write!(f, "1 "),
-                    Cell::Dead => write!(f, "0 "),
-                }?
+                let out = match cell {
+                    Cell::Alive => "1 ",
+                    Cell::Dead => "0 ",
+                };
+                write!(f, "{}", out)?
             }
             writeln!(f, "")?;
         }
