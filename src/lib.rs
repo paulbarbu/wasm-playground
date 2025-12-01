@@ -2,6 +2,7 @@ mod utils;
 
 use std::fmt::{Display, Formatter};
 
+use fixedbitset::FixedBitSet;
 use wasm_bindgen::prelude::*;
 
 use js_sys::Math;
@@ -28,7 +29,7 @@ pub enum Cell {
 pub struct Universe {
     width: u32,
     height: u32,
-    cells: Vec<Cell>,
+    cells: FixedBitSet,
 }
 
 impl Universe {
@@ -57,18 +58,19 @@ impl Universe {
 
 #[cfg(feature = "binary")]
 impl Universe{
-    
-    
     pub fn rand(width: u32, height: u32) -> Self {
         use rand::prelude::*;
-        // let mut cells = vec![Cell::Dead; (width * height) as usize];
         
-        let cells = (0..width*height).map(|index|  {
-            match rand::random::<bool>() {
-                true => Cell::Alive,
-                false => Cell::Dead
-            }
-        }).collect();
+        let mut cells = FixedBitSet::with_capacity((width * height) as usize);
+
+        for i in 0..cells.len(){
+            
+            let v = match rand::random::<bool>() {
+                true => true,
+                false => false
+            };
+            cells.set(i, v);
+        }
         
         Self {
             width: width,
@@ -90,21 +92,21 @@ impl Universe {
                 let cell = self.cells[i];
                 let alive_neighbours = self.num_alive_neighbours(row, col);
                 match (cell, alive_neighbours) {
-                    (Cell::Alive, 0 | 1) => {
+                    (true, 0 | 1) => {
                         //underpopulation
-                        next[i] = Cell::Dead;
+                        next.set(i, false);
                     }
-                    (Cell::Alive, 2 | 3) => {
+                    (true, 2 | 3) => {
                         //continues to live
-                        next[i] = Cell::Alive;
+                        next.set(i, true);
                     }
-                    (Cell::Alive, _) => {
+                    (true, _) => {
                         //overpopulation
-                        next[i] = Cell::Dead;
+                        next.set(i, false);
                     }
-                    (Cell::Dead, 3) => {
+                    (false, 3) => {
                         //reproduction
-                        next[i] = Cell::Alive;
+                        next.set(i, true);
                     }
                     _ => {}
                 }
@@ -116,11 +118,11 @@ impl Universe {
 
     pub fn new(width: u32, height: u32) -> Self {
         // create a line
-        let mut cells = vec![Cell::Dead; (width * height) as usize];
+        let mut cells = FixedBitSet::with_capacity((width * height) as usize);
         let i = (((width * height) / 2) + width / 2) as usize;
-        cells[i - 1] = Cell::Alive;
-        cells[i] = Cell::Alive;
-        cells[i + 1] = Cell::Alive;
+        cells.set(i - 1, true);
+        cells.set(i, true);
+        cells.set(i + 1, true);
         Self {
             width: width,
             height: height,
@@ -132,23 +134,25 @@ impl Universe {
         self.to_string()
     }
 
-    pub fn cells(&self) -> *const Cell{
-        self.cells.as_ptr()
+    pub fn cells(&self) -> *const usize{
+        self.cells.as_slice().as_ptr()
     }
     
-    pub fn rand(width: u32, height: u32) -> Self {
-        
-        // let mut cells = vec![Cell::Dead; (width * height) as usize];
-        
-        let cells = (0..width*height).map(|index|  {
-            if Math::random() < 0.5 {
-                Cell::Alive
+    #[cfg(not(feature = "binary"))]
+    pub fn rand(width: u32, height: u32) -> Self {  
+        let mut cells = FixedBitSet::with_capacity((width * height) as usize);
+
+        for i in 0..cells.len(){
+            
+            let v = if Math::random() < 0.5 {
+                true
             }
             else {
-                Cell::Dead
+                false
+            };
+            cells.set(i, v);
 
-            }
-        }).collect();
+        }
         
         Self {
             width: width,
@@ -166,8 +170,8 @@ impl Display for Universe {
 
                 let cell = self.cells[i];
                 let out = match cell {
-                    Cell::Alive => "1 ",
-                    Cell::Dead => "0 ",
+                    true => "1 ",
+                    false => "0 ",
                 };
                 write!(f, "{}", out)?
             }
