@@ -135,11 +135,9 @@ impl Universe {
     pub fn cells(&self) -> *const Cell{
         self.cells.as_ptr()
     }
-    
+
+    #[cfg(not(feature = "binary"))]
     pub fn rand(width: u32, height: u32) -> Self {
-        
-        // let mut cells = vec![Cell::Dead; (width * height) as usize];
-        
         let cells = (0..width*height).map(|index|  {
             if Math::random() < 0.5 {
                 Cell::Alive
