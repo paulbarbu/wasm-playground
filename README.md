@@ -1,3 +1,9 @@
+# Instructions
+`wasm-pack build`
+`python3 ws_server.py` (`pip3 install websockets`)
+`cd www && npm run start`
+
+# original
 <div align="center">
 
   <h1><code>wasm-pack-template</code></h1>

@@ -6,6 +6,7 @@ use wasm_bindgen::prelude::*;
 
 use js_sys::Math;
 
+
 #[wasm_bindgen]
 extern "C" {
     fn alert(s: &str);
@@ -121,6 +122,17 @@ impl Universe {
         cells[i - 1] = Cell::Alive;
         cells[i] = Cell::Alive;
         cells[i + 1] = Cell::Alive;
+        Self {
+            width: width,
+            height: height,
+            cells: cells,
+        }
+    }
+
+    pub fn zero(width: u32, height: u32) -> Self {
+        // create a line
+        let mut cells = vec![Cell::Dead; (width * height) as usize];
+        
         Self {
             width: width,
             height: height,
